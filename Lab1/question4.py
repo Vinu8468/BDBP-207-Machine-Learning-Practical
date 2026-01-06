@@ -21,11 +21,6 @@ for val in x:
     pdf = (1 / (sigma * math.sqrt(2 * math.pi))) *  math.exp(-((val - mean) ** 2) / (2 * sigma ** 2))
     y.append(pdf)
 
-
-for i in range(0, num, 20):
-    print(f"x = {x[i]:.2f}, PDF = {y[i]:.6f}")
-
-# Plot
 plt.plot(x, y)
 plt.xlabel("x")
 plt.ylabel("Gaussian PDF")

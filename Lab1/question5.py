@@ -23,3 +23,18 @@ plt.xlabel("X1")
 plt.ylabel("Y")
 plt.title("y = n**2")
 plt.show()
+
+points=[-5, -3, 0, 3, 5]
+
+derivatives=[]
+for p in points:
+    derivatives.append(2*p)
+
+for x,d in zip(points, derivatives):
+    print(f"Derivative at x1 = {x}: {d}")
+
+#The value of x1 at which the function value (y) is zero is 0
+
+#we can infer that at 0.. the slope is the global
+# minimum for this function which is zero and which
+# means that  the tangent is 0.
