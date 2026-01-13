@@ -18,3 +18,7 @@ print(f"Dotproduct: {dot}")
 # if its zero... then the vectors are orthogonal/perpendicular to each other.
 
 # another interpretation is it gives the magnitude of projection of one vector onto another(its scaled by the other's length).
+myX=[1,2,3]
+myY=[3,2,1]
+dot2=Dotproduct(myX,myY)
+print(f"Dotproduct with my example: {dot2}")
