@@ -1,9 +1,8 @@
 # Implement california housing prediction model using
 # scikit-learn - walkthro’ of
 # bdbp207_californiahousing.py
-import numpy as np
+
 import pandas as pd
-import matplotlib.pyplot as plt
 # import sys
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split

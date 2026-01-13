@@ -1,73 +1,81 @@
-# For a design or feature matrix,
-# X=[[1,0,2],
-#    [0,1,1],
-#    [2,1,0],
-#    [1,1,1],
-#    [0,2,1]]
-# Compute the covariance matrix using matrix multiplications.
-# Verify your results by using numpy library operations
 
-# number of samples: n=5
-# number of features: d=3
-
-# covariance matrix formula
-# Cov(X)=1/n-1(XcT Xc)
-# Xc=X-u(column - wise mean centred matrix)
-# n-1=4
+# Covariance Matrix Computation using Matrix Multiplication
+# Given a design / feature matrix X with:
+# - n samples (rows)
+# - d features (columns)
+# We compute the covariance matrix using the formula:
+#     Cov(X) = (1 / (n - 1)) * (Xcᵀ · Xc)
+# where:
+# - Xc is the mean-centered data matrix
+# - Xcᵀ is the transpose of Xc
 
 
-X=[
-   [1,0,2],
-   [0,1,1],
-   [2,1,0],
-   [1,1,1],
-   [0,2,1]
-   ]
-n=len(X)
+# Input feature matrix
+
+X = [
+    [1, 0, 2],
+    [0, 1, 1],
+    [2, 1, 0],
+    [1, 1, 1],
+    [0, 2, 1]
+]
+
+n = len(X)          #rows
+d = len(X[0])       #columns
+
+#Computing column-wise mean
 
 means = []
-for i in range(len(X[0])):
-    ele=0
-    for j in range(len(X)):
-        ele+=X[j][i]
-    means.append(ele/n)
+for j in range(d):
+    column_sum = 0
+    for i in range(n):
+        column_sum += X[i][j]
+    means.append(column_sum / n)
 
+print("Column-wise means:")
 print(means)
-# Mean-centered matrix Xc
+
+# Mean-center the matrix (Xc = X - mean)
+
 Xc = []
 for row in X:
     centered_row = []
-    for j in range(len(row)):
+    for j in range(d):
         centered_row.append(row[j] - means[j])
     Xc.append(centered_row)
 
+print("\nMean-centered matrix Xc:")
 print(Xc)
-# Transpose Xc
+
+#Transpose of Xc (XcT)
+
 Xc_T = list(zip(*Xc))
-# Matrix multiplication: Xc_T @ Xc
+
+print("\nTranspose of Xc (XcT):")
+print(Xc_T)
+
+# Step 4: Matrix multiplication (XcT · Xc)
+
 XtX = []
-for i in range(len(Xc_T)):
+for i in range(d):
     row = []
-    for j in range(len(Xc_T)):
+    for j in range(d):
         s = 0
-        for k in range(len(Xc)):
+        for k in range(n):
             s += Xc_T[i][k] * Xc[k][j]
         row.append(s)
     XtX.append(row)
 
+print("\nMatrix multiplication Xcᵀ · Xc:")
 print(XtX)
+
+
 # Covariance matrix
-cov = []
+
+covariance_matrix = []
 for row in XtX:
-    cov.append([val / (n - 1) for val in row])
+    covariance_matrix.append([value / (n - 1) for value in row])
 
-print(cov)
-#verification using numpy
-import numpy as np
+print("\nCovariance Matrix:")
+print(covariance_matrix)
 
-X_np = np.array(X)
-
-# NumPy covariance
-cov_np = np.cov(X_np, rowvar=False)
-
-print(cov_np)
