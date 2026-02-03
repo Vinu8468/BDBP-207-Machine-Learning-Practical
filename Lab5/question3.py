@@ -2,18 +2,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+X=np.random.randint(-10,10,1000)
+X=np.sort(X)
+Y=[(1/(1+np.exp(-x))) for x in X]
 
-def sigmoid_derivative(x):
-    s =sigmoid(x)
-    return s*(1-s)
-
-X = np.linspace(-10, 10, 1000)
-Y = sigmoid(X)
-Dir = sigmoid_derivative(X)
-
-plt.plot(X, Dir)
+Dir=[np.exp(-x)/((1+np.exp(-x))**2) for x in X]
+plt.plot(X,Dir)
 plt.xlabel("x")
 plt.ylabel("Sigmoid Derivative")
 plt.title("Derivative of Sigmoid Function")
