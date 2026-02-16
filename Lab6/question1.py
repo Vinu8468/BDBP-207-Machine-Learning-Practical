@@ -13,7 +13,7 @@ digits=load_digits()
 X=digits.data
 y=digits.target
 K = 10 # k is set to 10. so its 10 fold cross validation.
-# print(X.shape) # this gives(150, 4) so select 150 by splicing for iris 
+# print(X.shape) # this gives(150, 4) so select 150 by splicing for iris
 n_samples = X.shape[0] #This is 150 a.k.a sample size.
 
 
