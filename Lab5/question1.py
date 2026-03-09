@@ -59,22 +59,22 @@ def stochastic_gradient_descent(X,y,theta,alpha,epochs):
 
 
 theta = np.zeros(X_train.shape[1])
-alpha = 0.01
+alpha = 0.01 # initializing alpha and epochs
 epochs = 50
 
-theta, cost_history = stochastic_gradient_descent(X_train, y_train, theta, alpha, epochs)
+theta, cost_history = stochastic_gradient_descent(X_train,y_train,theta,alpha,epochs)
 
 plt.plot(cost_history)
 plt.title("Cost Function")
 plt.xlabel("Epochs")
 plt.ylabel("Cost")
-plt.show()
+# plt.show()
 
-
+# this is the testing part
 y_pred = hypothesis(theta, X_test)
-
+# getting the model r2 and mean squared error when tested against ground truth
 r2 = r2_score(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
 
-print("R2 Score:", r2)
-print("Mean Squared Error:", mse)
+print("R2 Score:",r2)
+print("Mean Squared Error:",mse)
