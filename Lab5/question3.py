@@ -17,3 +17,9 @@ plt.title("Sigmoid Function and its Derivative")
 plt.legend() # this will display the label on the left hand side.
 plt.show()
 
+# Y=[]
+# for x in X:
+#     yval=(1/(1+np.exp(-x)))
+#     dir = yval*(1-yval)
+#     Y.append(dir)
+
