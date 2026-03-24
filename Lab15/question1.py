@@ -4,7 +4,7 @@
 # ISLP package and use Direction as the target variable for the
 # classification.
 
-from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingRegressor, GradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
 from ISLP import load_data
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error,accuracy_score
