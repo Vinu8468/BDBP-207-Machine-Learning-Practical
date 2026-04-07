@@ -33,7 +33,13 @@ print("MSE by XGBoost Regressor on diabetes datasets: ",mse)
 print("R2 by XGBoost Regressor on diabetes datasets:",r2)
 
 #####################3##########################
-print("_________________________________________________________________")
+separator=""
+n=67
+for i in range(n):
+    separator += "_"
+print(separator)
+
+
 # Classifier
 
 iris = load_iris()
@@ -46,7 +52,6 @@ xgcla = XGBClassifier(
     learning_rate=0.1,
     n_estimators=100,
     max_depth=3,
-    use_label_encoder=False,
     eval_metric="mlogloss"
 )
 
