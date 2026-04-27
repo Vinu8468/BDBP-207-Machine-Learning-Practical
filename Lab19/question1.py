@@ -10,122 +10,128 @@
 #    Plot the ROC curve
 #    AUC
 
+# load all the important packages and libraries
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+import pandas as pd
+import sys
 
-df = pd.read_csv('Heart.csv', index_col=0)
-# print(data.head())
-# print(data.describe())
-# print(data.shape)
-# print(data.info())
+df = pd.read_csv("Heart.csv",index_col=0)
+print(df.head())
+print(df.describe())
+print(df.shape)
+print(df.info()) # this was important because it told me that there were null values in few columns
 
-# manual label encoding for the target
-df["AHD"] = df["AHD"].map({"No": 0, "Yes": 1})
+# everything except column AHD is feature
+X = df.drop(columns="AHD")
+y = df["AHD"] # this one is target
 
-# encoding of data for chestPain and Thal
-df = pd.get_dummies(df, columns=["ChestPain", "Thal"], drop_first=True)
+# since y is yes and no we should convert it to 1 and 0 so label encoder
+encoder = LabelEncoder()
+y = encoder.fit_transform(y)
 
-# Features and Target
-X = df.drop(columns=["AHD"], axis=1)
-y = df["AHD"]
+# and also one hot encode the columns of x (ChestPain and thal)
+X = pd.get_dummies(X,columns = ["ChestPain","Thal"],drop_first = True)
 
 # splitting the data into train and test (30% test)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=123
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 123)
 
-# print(X_train.head())
-# print(y_test.head())
+X_train = X_train.fillna(X_train.mean())
+X_test = X_test.fillna(X_test.mean())
 
-# train model
-model = LogisticRegression(max_iter=1000)
-model.fit(X_train, y_train)
+# standardization to prevent extrapolation of one feature over others
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-# get the probabilities
-y_prob = model.predict_proba(X_test)[:, 1]
-y_true = y_test.values
+logreg = LogisticRegression(max_iter = 1000)
+# training the model
+logreg.fit(X_train, y_train)
+
+# predictions now
+y_pred = logreg.predict(X_test)
+y_prob = logreg.predict_proba(X_test)[:,1] # this one is for all the threshold
+# now we have both the predicted and actual test y values
+
+def confusion_matrix(y_test, y_pred):
+    TP =0
+    FP = 0
+    FN =0
+    TN =0
+    for i in range(len(y_test)):
+        if y_test[i] == y_pred[i]:
+            if y_test[i] == 1:
+                TP += 1
+            else:
+                TN += 1
+        else:
+            if y_test[i] == 1:
+                FN += 1
+            else:
+                FP += 1
+    return TP,FP,FN,TN
+
+def accuracy(y_test, y_pred):
+    TP, FP, FN, TN = confusion_matrix(y_test, y_pred)
+    accuracy = (TP+TN)/(TP+FP+TN+FN)
+    return accuracy
+
+def precision(y_test, y_pred):
+    TP, FP, FN, TN = confusion_matrix(y_test, y_pred)
+    precision = (TP)/(TP+FP)
+    return precision
+
+def recall(y_test, y_pred):
+    TP, FP, FN, TN = confusion_matrix(y_test, y_pred)
+    recall = (TP)/(TP+FN)
+    return recall
+
+def specificity(y_test, y_pred):
+    TP, FP, FN, TN = confusion_matrix(y_test, y_pred)
+    specificity = (TN)/(TN+FP)
+    return specificity
+
+def f1(y_test, y_pred):
+    TP, FP, FN, TN = confusion_matrix(y_test, y_pred)
+    f1 = 2*TP/(2*TP+FP+FN)
+    return f1
+
+TP, FP, FN, TN = confusion_matrix(y_test, y_pred)
+print(f"TP : {TP}\nTN : {TN}\n FP : {FP} \n FN : {FN}")
+print(f"Accuracy of model is : {accuracy(y_test, y_pred)}")
+print(f"Precision of model is :{precision(y_test, y_pred)}")
+print(f"Recall of model is :{recall(y_test, y_pred)}")
+print(f"Specificity of model is :{specificity(y_test, y_pred)}")
+print(f"F1 score of model is :{f1(y_test, y_pred)}")
+
+thresolds = [0.2,0.3,0,4,0.5,0.6,0.7,0.8,0.9] # this is to calculate tpr and fpr as the threshold increases
+
+tpr_list = []
+fpr_list = []
+f1_list = []
+accuracy_list = []
+
+for thresh in thresolds:
+    y_pred_thresh = (y_prob >= thresh).astype(int)
+
+    TP, FP, FN, TN = confusion_matrix(y_test, y_pred_thresh)
+    acc = (TP+TN)/(TP+FP+FN+TN) if (TP+FP+FN+TN) > 0 else 0
+    prec = TP/(TP+FP) if (TP+FP) > 0 else 0
+    rec = TP/(TP+FN) if (TP+FN) > 0 else 0
+    spec = TN/(TN+FP) if (TN+FP) > 0 else 0
+
+    fpr = FP/(FP+TN) if (FP+TN) > 0 else 0
+
+    tpr_list.append(rec)
+    fpr_list.append(fpr)
+    f1_list.append(f1)
+    accuracy_list.append(acc)
 
 
-class MetricsEvaluatorVin:
-
-    # confusion matrix
-    def confusion_matrix(self, y_true, y_prob, threshold):
-        y_pred = (y_prob >= threshold).astype(int)
-
-        TP = np.sum((y_true == 1) & (y_pred == 1))
-        TN = np.sum((y_true == 0) & (y_pred == 0))  # FIXED
-        FP = np.sum((y_true == 0) & (y_pred == 1))  # FIXED
-        FN = np.sum((y_true == 1) & (y_pred == 0))
-
-        return TP, TN, FP, FN
-
-    # all the metrics accuracy, precision, sensitivity, specificity and F1
-    def calculate_metrics(self, TP, TN, FP, FN):
-        accuracy = (TP + TN) / (TP + TN + FP + FN)
-
-        precision = TP / (TP + FP) if (TP + FP) > 0 else 0
-
-        sensitivity = TP / (TP + FN) if (TP + FN) > 0 else 0
-
-        specificity = TN / (TN + FP) if (TN + FP) > 0 else 0
-
-        F1 = (2 * precision * sensitivity) / (precision + sensitivity) if (precision + sensitivity) > 0 else 0
-
-        return accuracy, precision, sensitivity, specificity, F1
-
-    # ROC curve which is taken at all the possible thresholds
-    def roc_curve(self, y_true, y_prob):
-        thresholds = np.linspace(0, 1, 100)  # FIXED
-
-        TPR = []
-        FPR = []
-
-        for t in thresholds:
-            TP, TN, FP, FN = self.confusion_matrix(y_true, y_prob, t)
-
-            tpr = TP / (TP + FN) if (TP + FN) > 0 else 0
-            fpr = FP / (FP + TN) if (FP + TN) > 0 else 0
-
-            TPR.append(tpr)
-            FPR.append(fpr)
-
-        return np.array(FPR), np.array(TPR)  # FIXED ORDER
-
-    # plotting the roc
-    def plot_roc(self, FPR, TPR):
-        plt.plot(FPR, TPR)
-        plt.plot([0, 1], [0, 1], linestyle='--')
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('ROC Curve')
-        plt.show()
-
-    # computing auc using trapezoidal rule
-    def compute_auc(self, FPR, TPR):
-        return np.trapz(TPR, FPR)  # FIXED
 
 
-evaluate = MetricsEvaluatorVin()
-thresholds = [0.3, 0.5, 0.7]
 
-for t in thresholds:
-    TP, TN, FP, FN = evaluate.confusion_matrix(y_true, y_prob, threshold=t)
 
-    acc, prac, sens, spec, f1 = evaluate.calculate_metrics(TP, TN, FP, FN)
-
-    print(f"\nThreshold: {t}")
-    print(f"Accuracy: {acc}")
-    print(f"Precision: {prac}")
-    print(f"Sensitivity: {sens}")
-    print(f"Specificity: {spec}")
-    print(f"F1 score: {f1}")
-
-# ROC + AUC
-FPR, TPR = evaluate.roc_curve(y_true, y_prob)
-evaluate.plot_roc(FPR, TPR)
-
-auc = evaluate.compute_auc(FPR, TPR)
-print(f"AUC: {auc}")
