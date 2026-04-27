@@ -107,7 +107,7 @@ print(f"Recall of model is :{recall(y_test, y_pred)}")
 print(f"Specificity of model is :{specificity(y_test, y_pred)}")
 print(f"F1 score of model is :{f1(y_test, y_pred)}")
 
-thresolds = [0.2,0.3,0,4,0.5,0.6,0.7,0.8,0.9] # this is to calculate tpr and fpr as the threshold increases
+thresolds = [0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9] # this is to calculate tpr and fpr as the threshold increases
 
 tpr_list = []
 fpr_list = []
@@ -130,8 +130,20 @@ for thresh in thresolds:
     f1_list.append(f1)
     accuracy_list.append(acc)
 
+# now ROC curves with few threshold values
+plt.figure()
+plt.plot(fpr_list, tpr_list)
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate (Sensitivity)")
+plt.title("ROC Curve")
+plt.show()
 
+# for auc .. np.trapz can be used but we need sorted fpr and tpr
+sorted_pairs = sorted(zip(fpr_list, tpr_list))
+fpr_sorted, tpr_sorted = zip(*sorted_pairs)
 
+auc = np.trapz(tpr_sorted, fpr_sorted)
+print("AUC of the model is :", auc)
 
 
 
